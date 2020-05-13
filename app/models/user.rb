@@ -2,19 +2,22 @@ class User < ApplicationRecord
 	attr_accessor :remember_token
 	before_save { self.email = self.email.downcase }
 
+	# name
 	validates :name,  presence: true,
 											length: { maximum: 50}
 
+	# email
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 	validates :email, presence: true,
 											length: { maximum: 255},
 											format: { with: VALID_EMAIL_REGEX },
 									uniqueness: true
 
+	# password
 	has_secure_password
-
 	validates :password, presence: true,
-											length: { minimum: 6 }
+												length: { minimum: 6 },
+											allow_nil: true
 
 	# 引数に渡された文字列をハッシュ化
 	def User.digest(string)
