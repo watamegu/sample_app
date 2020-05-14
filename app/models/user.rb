@@ -1,7 +1,9 @@
 class User < ApplicationRecord
-	attr_accessor :remember_token
-	before_save { self.email = self.email.downcase }
+	attr_accessor :remember_token, :activation_token
+	before_save 	:downcase_email
+	before_create :create_activation_digest
 
+	#　-- バリデーション --
 	# name
 	validates :name,  presence: true,
 											length: { maximum: 50}
@@ -19,6 +21,7 @@ class User < ApplicationRecord
 												length: { minimum: 6 },
 											allow_nil: true
 
+	# -- ログイン情報の認証関連 --
 	# 引数に渡された文字列をハッシュ化
 	def User.digest(string)
 		cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
@@ -38,15 +41,29 @@ class User < ApplicationRecord
 	end
 
 	# 渡されたトークンがダイジェストと一致したらtrueを返す
-	def authenticated?(remember_token)
-		return false if remember_digest.nil?
-		BCrypt::Password.new(remember_digest).is_password?(remember_token)
+	def authenticated?(attribute,token)
+		digest = send("#{attribute}_digest")
+		return false if digest.nil?
+		BCrypt::Password.new(digest).is_password?(token)
 	end
 
+	# -- ログアウト関連 --
 	# ユーザーのログイン情報を破棄する
 	def forget
 		self.update_attribute(:remember_digest, nil)
 	end
 
+	private
 
+		# メールアドレスをすべて小文字にする
+		def downcase_email
+			self.email = self.email.downcase
+		end
+
+		# -- アカウントのアクティベーション関連 --
+		# 有効化トークンとダイジェストを作成および代入する
+		def create_activation_digest
+			self.activation_token = User.new_token
+			self.activation_digest = User.digest(activation_token)
+		end
 end
