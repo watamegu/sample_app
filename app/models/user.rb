@@ -83,6 +83,13 @@ class User < ApplicationRecord
 		self.reset_sent_at < 2.hours.ago
 	end
 
+	# -- フィード関連 --
+	# 試作 feed の定義
+	# 完全な実装は次章の「ユーザーをフォローする」を参照
+	def feed
+		Micropost.where("user_id = ?", self.id)
+	end
+
 	private
 
 		# メールアドレスをすべて小文字にする
