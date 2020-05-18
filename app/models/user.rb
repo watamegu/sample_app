@@ -98,7 +98,7 @@ class User < ApplicationRecord
 		Micropost.where("user_id = ?", self.id)
 	end
 
-	#フォロー関連
+	# -- フォロー関連 --
 	# ユーザーをフォローする
 	def follow(other_user)
 		following << other_user
