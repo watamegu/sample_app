@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
 	include SessionsHelper
 
-	private
+  private
 
 		# ログイン済ユーザーが確認
     def logged_in_user
@@ -11,5 +11,4 @@ class ApplicationController < ActionController::Base
         redirect_to login_url
       end
     end
-
 end
